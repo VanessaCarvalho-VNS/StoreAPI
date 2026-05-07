@@ -1,6 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace StoreAPI.Models;
 
@@ -30,6 +31,8 @@ public class Produto
     public DateTime DataCadastro { get; set; }
 
     public int CategoriaId { get; set; }
+
+    [JsonIgnore] // Evita referência circular durante a serialização JSON
     public Categoria? Categoria { get; set; }
 
 }
