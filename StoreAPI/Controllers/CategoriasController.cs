@@ -27,7 +27,17 @@ namespace StoreAPI.Controllers
         [HttpGet] // rota para obter somente as categorias
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _context.Categorias.ToList();
+            try
+            {
+                throw new DataMisalignedException();
+                //return _context.Categorias.AsNoTracking().ToList();
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
+            
             
         }
 
@@ -35,19 +45,28 @@ namespace StoreAPI.Controllers
 
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
-            if (categoria is null)
+            try
             {
-                return NotFound("Categoria não encontrada...");
+                var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+                if (categoria is null)
+                {
+                    return NotFound($"Categoria com id={id} não encontrada...");
+                }
+                return categoria;
             }
-            return categoria;
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
+            }
+            
         }
 
         [HttpPost] // rota para criar nova categoria
         public ActionResult Post(Categoria categoria)
         {
             if (categoria is null)
-                return BadRequest();
+                return BadRequest("Dados inválidos.");
 
             _context.Categorias.Add(categoria);
             _context.SaveChanges();
@@ -61,7 +80,7 @@ namespace StoreAPI.Controllers
         {
             if (id != categoria.CategoriaId)
             {
-                return BadRequest();
+                return BadRequest("Dados inválidos.");
             }
 
 
@@ -78,7 +97,7 @@ namespace StoreAPI.Controllers
 
             if (categoria is null)
             {
-                return NotFound("Categoria não encontrada...");
+                return NotFound($"Categoria com id={id} não encontrada...");
             }
 
             _context.Categorias.Remove(categoria);
